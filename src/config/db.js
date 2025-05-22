@@ -19,7 +19,6 @@ const db = new pg.Pool({
   database: process.env.DB,
   user: process.env.USER,
   password: process.env.PASSWORD,
-  // connectionString: 'postgres://avnadmin:AVNS_gPAKVpfW9BNHQq9D3ah@freedb-firman670676-8efd.c.aivencloud.com:28333/defaultdb?sslmode=require',
  ssl: {
     rejectUnauthorized: true,
     ca,
