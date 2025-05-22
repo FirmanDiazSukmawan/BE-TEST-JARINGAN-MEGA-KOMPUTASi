@@ -63,23 +63,42 @@ const createOrders = (data) => {
 };
 
 
-const getOrdersByUserId = (users_id) => {
-  return db.query(` 
-    SELECT 
-    order.*, 
-    user.username AS buyerName,
-    user.image AS imageProfile, 
-    TO_CHAR(order.created_at, 'DD-MM-YYYY HH24:MI:SS') AS created_at
-FROM 
-    order
-LEFT JOIN 
-    user
-ON 
-    order.user_id = user.user_id
-WHERE 
-    user.user_id = ${users_id};
-`);
+const getOrdersByUserId = (user_id, data) => {
+  let { searchBy, search, sortBy, sort, limit, offset } = data;
+
+  const allowedSearchFields = ['name_product'];
+  const allowedSortFields = ['order_id','name_product', 'qty',"berat",'created_at'];
+  const allowedSortDirections = ['ASC', 'DESC'];
+
+  if (!allowedSearchFields.includes(searchBy)) searchBy = 'name_product';
+  if (!allowedSortFields.includes(sortBy)) sortBy = 'order_id';
+  if (!allowedSortDirections.includes(sort.toUpperCase())) sort = 'ASC';
+
+  return db.query(
+    `SELECT 
+      "order".*, 
+      "user".username AS buyerName
+    FROM "order"
+    LEFT JOIN "user" ON "order".user_id = "user".user_id
+    WHERE "order".user_id = $1
+      AND ${searchBy} ILIKE $2
+    ORDER BY ${sortBy} ${sort}
+    LIMIT $3 OFFSET $4`,
+    [user_id, `%${search}%`, limit, offset]
+  );
 };
+
+const countOrdersByUserId = (user_id, searchBy, search) => {
+  
+  const allowedSearchFields = ['name_product'];
+  if (!allowedSearchFields.includes(searchBy)) searchBy = 'name_product';
+
+  return db.query(
+    `SELECT COUNT(*) AS total FROM "order" WHERE user_id = $1 AND ${searchBy} ILIKE $2`,
+    [user_id, `%${search}%`]
+  );
+};
+
 
 
 const updateOrders = (data, order_id) => {
@@ -107,5 +126,6 @@ export default  {
   createOrders,
   updateOrders,
   deleteOrders,
-getOrdersByUserId
+getOrdersByUserId,
+countOrdersByUserId
 };

@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get("/", getOrder);
 router.get("/:order_id", getOrderById);
-router.get("/user/:users_id", getByUserId);
+router.get("/user/:user_id", getByUserId);
 router.post("/",upload, createOrder);
 router.put("/:order_id",upload, updateOrder);
 router.delete("/:order_id", deleteOrder);
